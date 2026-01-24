@@ -1,0 +1,46 @@
+from aiogram import Router, types
+from modules.todo.logic import add_item, get_item, remove_item
+from aiogram.filters import CommandStart, Command
+
+todo_router = Router()
+
+
+@todo_router.message(lambda m: m.text == "ToDo")
+async def todo_entry (message: types.Message):
+    await message.answer(
+        "TODO:\n"
+        "• Напиши задачу, чтобы добавить\n"
+        "• Напиши /list чтобы увидеть все задачи\n"
+        "• Напиши /done <номер> чтобы удалить задачу"
+    )
+
+@todo_router.message(lambda m: m.text and not m.text.startswith("/"))
+async def add_task(message: types.Message):
+    add_item(message.text)
+    await message.answer(f"Задача добавлена: {message.text}")
+
+@todo_router.message(Command ("list"))
+async def list_tasks (message: types.Message):
+    items = get_item()
+    if not items:
+        await message.answer ("Список пуст")
+    else:
+        text = "\n".join([f"{i+1}. {item}" for i, item in enumerate(items)])
+        await message.answer(f"Список задач: \n{text}")
+
+@todo_router.message(Command ("done"))
+async def done_tasks (message: types.Message):
+    parts = message.text.split()
+    if len(parts) != 2 or not parts [1].isdigit():
+        await message.answer("Используй /done <номер задачи>")
+        return
+    
+    index = int(parts[1]) - 1
+    items = get_item()
+    
+    if 0 <= index < len(items):
+        removed = items[index]
+        remove_item(index)
+        await message.answer(f"Задача выполнена и удалена: {removed}")
+    else:
+        await message.answer("Неверный номер задачи")
