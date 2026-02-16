@@ -13,11 +13,12 @@ def is_in_todo(user_id: int) -> bool:
 def add_item(user_id: int, item: str):
     todo_list.setdefault(user_id, []).append(item)
 
-def get_item(user_id: int, item: str):
+def get_item(user_id: int):
     return todo_list.get(user_id, [])
 
 def remove_item(user_id: int, index: int):
     items = todo_list.get(user_id)
-    if 0 <= index < len(todo_list):
-        todo_list.pop(index)
+    
+    if items and 0 <= index < len(items):
+        items.pop(index)
 

@@ -12,7 +12,8 @@ async def todo_entry (message: types.Message):
         "TODO:\n"
         "• Напиши задачу, чтобы добавить\n"
         "• Напиши /list чтобы увидеть все задачи\n"
-        "• Напиши /done <номер> чтобы удалить задачу"
+        "• Напиши /done <номер> чтобы удалить задачу\n"
+        "• Напиши /exit для выхода\n"
     )
 
 @todo_router.message(lambda m: m.text and not m.text.startswith("/"))
@@ -30,9 +31,9 @@ async def list_tasks (message: types.Message):
     if not items:
         await message.answer ("Список пуст")
         return
-    else:
-        text = "\n".join([f"{i+1}. {item}" for i, item in enumerate(items)])
-        await message.answer(f"Список задач: \n{text}")
+
+    text = "\n".join([f"{i+1}. {item}" for i, item in enumerate(items)])
+    await message.answer(f"Список задач: \n{text}")
 
 @todo_router.message(Command ("done"))
 async def done_tasks (message: types.Message):
@@ -45,7 +46,7 @@ async def done_tasks (message: types.Message):
         return
     
     index = int(parts[1]) - 1
-    items = get_item()
+    items = get_item(message.from_user.id)
     
     if 0 <= index < len(items):
         removed = items[index]
@@ -55,6 +56,6 @@ async def done_tasks (message: types.Message):
         await message.answer("Неверный номер задачи")
 
 @todo_router.message(Command ("exit"))
-async def exit_todo_cmd(message: types.Massage):
+async def exit_todo_cmd(message: types.Message):
     exit_todo(message.from_user.id)
     await message.answer("Выходи из ToDo")
