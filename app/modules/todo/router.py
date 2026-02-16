@@ -17,20 +17,28 @@ async def todo_entry (message: types.Message):
 
 @todo_router.message(lambda m: m.text and not m.text.startswith("/"))
 async def add_task(message: types.Message):
+    if not is_in_todo(message.from_user.id):
+        return
+    
     add_item(message.from_user.id, message.text)
     await message.answer(f"Задача добавлена: {message.text}")
 
 @todo_router.message(Command ("list"))
 async def list_tasks (message: types.Message):
     items = get_item(message.from_user.id)
+    
     if not items:
         await message.answer ("Список пуст")
+        return
     else:
         text = "\n".join([f"{i+1}. {item}" for i, item in enumerate(items)])
         await message.answer(f"Список задач: \n{text}")
 
 @todo_router.message(Command ("done"))
 async def done_tasks (message: types.Message):
+    if not is_in_todo(message.from_user.id):
+        return
+    
     parts = message.text.split()
     if len(parts) != 2 or not parts [1].isdigit():
         await message.answer("Используй /done <номер задачи>")
