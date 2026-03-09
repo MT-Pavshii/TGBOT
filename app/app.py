@@ -1,5 +1,7 @@
 import asyncio
 import os
+from data import db
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from bot_commands import bot_commands
