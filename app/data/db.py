@@ -13,8 +13,24 @@ CREATE TABLE IF NOT EXISTS users (
 
 conn.commit()
 
-cursor.execute("SELECT * FROM users")
-rows = cursor.fetchall()
+def add_users(telegram_id: int, username: str):
+    cursor.execute(
+        "INSERT OR IGNORE INTO users (telegram_id, username) VALUES (?, ?)",
+        (telegram_id, username)
+    )
+    conn.commit()
 
-for row in rows:
-    print (row)
+#cursor.execute("SELECT * FROM users")
+#print(cursor.fetchall())
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id  INTEGER,
+    tasks TEXT
+    )
+""")
+conn.commit()
+
+#cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+#print(cursor.fetchall())
